@@ -1,0 +1,862 @@
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PULSE.TYPE | Typing Speed Test</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+    --bg: #101010;
+    --panel: #181818;
+    --text: #e5e5e5;
+    --muted: #666;
+    --yellow: #e2b714;
+    --green: #80c995;
+    --red: #e05b5b;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+}
+
+.container {
+    max-width: 1150px;
+    width: 90%;
+    margin: auto;
+}
+
+/* HEADER */
+
+header {
+    padding: 28px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+}
+
+.logo span {
+    color: var(--yellow);
+}
+
+.logo small {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    display: block;
+    margin-top: 3px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.header-right button {
+    color: var(--muted);
+    background: transparent;
+    font-size: 14px;
+    transition: .3s;
+}
+
+.header-right button:hover {
+    color: var(--yellow);
+}
+
+/* MAIN */
+
+main {
+    padding-top: 70px;
+}
+
+.welcome {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.welcome h1 {
+    font-size: clamp(35px, 5vw, 65px);
+    letter-spacing: -3px;
+    margin-bottom: 15px;
+}
+
+.welcome h1 span {
+    color: var(--yellow);
+}
+
+.welcome p {
+    color: var(--muted);
+    font-size: 15px;
+}
+
+/* SETTINGS */
+
+.settings {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.setting-group {
+    background: var(--panel);
+    padding: 9px;
+    border-radius: 10px;
+    display: flex;
+    gap: 5px;
+}
+
+.setting-group button {
+    background: transparent;
+    color: var(--muted);
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-size: 13px;
+    transition: .2s;
+}
+
+.setting-group button.active {
+    color: var(--yellow);
+    background: #29250f;
+}
+
+/* TEST */
+
+.test-box {
+    background: #151515;
+    border: 1px solid #252525;
+    border-radius: 15px;
+    padding: 35px;
+    position: relative;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.stat label {
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.stat strong {
+    color: var(--yellow);
+    font-size: 28px;
+    font-family: "Space Mono", monospace;
+}
+
+#textDisplay {
+    font-family: "Space Mono", monospace;
+    font-size: 22px;
+    line-height: 2;
+    color: #555;
+    height: 175px;
+    overflow: hidden;
+    position: relative;
+    word-break: break-word;
+}
+
+.char {
+    position: relative;
+}
+
+.char.correct {
+    color: var(--text);
+}
+
+.char.incorrect {
+    color: var(--red);
+    background: #401c1c;
+    border-radius: 3px;
+}
+
+.char.current {
+    color: var(--yellow);
+}
+
+.char.current::before {
+    content: "";
+    position: absolute;
+    left: -2px;
+    top: 4px;
+    height: 25px;
+    width: 2px;
+    background: var(--yellow);
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+.typing-input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    left: 0;
+    bottom: 0;
+    resize: none;
+    pointer-events: none;
+}
+
+.test-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #252525;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.test-bottom p {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.restart {
+    background: #242424;
+    color: var(--yellow);
+    padding: 12px 18px;
+    border-radius: 8px;
+    transition: .3s;
+}
+
+.restart:hover {
+    background: #333;
+    transform: translateY(-2px);
+}
+
+/* RESULT */
+
+.result {
+    display: none;
+    text-align: center;
+    padding: 45px 20px;
+    margin-top: 25px;
+    background: var(--panel);
+    border-radius: 15px;
+    border: 1px solid #252525;
+    animation: appear .4s ease;
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.result h2 {
+    color: var(--yellow);
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.result p {
+    color: var(--muted);
+    margin-bottom: 25px;
+}
+
+.result-stats {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.result-stats strong {
+    display: block;
+    font-size: 35px;
+    color: var(--yellow);
+    font-family: "Space Mono", monospace;
+}
+
+.result-stats span {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+}
+
+.result button {
+    background: var(--yellow);
+    color: #111;
+    padding: 13px 25px;
+    border-radius: 8px;
+    font-weight: 700;
+}
+
+/* FOOTER */
+
+footer {
+    text-align: center;
+    padding: 50px 0 30px;
+    color: #444;
+    font-size: 12px;
+}
+
+footer span {
+    color: var(--yellow);
+}
+
+/* RESPONSIVE */
+
+@media(max-width: 650px) {
+    main {
+        padding-top: 40px;
+    }
+
+    .welcome h1 {
+        letter-spacing: -1px;
+    }
+
+    .test-box {
+        padding: 20px;
+    }
+
+    #textDisplay {
+        font-size: 17px;
+        height: 160px;
+    }
+
+    .stats {
+        gap: 15px;
+    }
+
+    .stat strong {
+        font-size: 22px;
+    }
+
+    .settings {
+        gap: 12px;
+    }
+
+    .setting-group button {
+        padding: 9px 11px;
+    }
+
+    .result-stats {
+        gap: 25px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+    <div class="logo">
+        PULSE<span>.</span>TYPE
+        <small>TYPE FASTER. THINK BETTER.</small>
+    </div>
+
+    <div class="header-right">
+        <button onclick="toggleTheme()" id="themeBtn">☀ Theme</button>
+        <button onclick="restartTest()">↻ Restart</button>
+        <a style="text-decoration: none; " href="./index.html" target="_blank">
+            <button><img width="42px" height="42px" style="border-radius: 15%; transition: 0.25s;" src="./Логотип новостного портала PLUSE.UZ.png" alt="PULSE.UZ"></button>
+        </a>
+    </div>
+</header>   
+
+<main>
+
+    <section class="welcome">
+        <h1>Test your <span>typing</span> speed.</h1>
+        <p>Klaviaturada qanchalik tez va aniq yozishingni tekshir.</p>
+    </section>
+
+    <section class="settings">
+
+        <div class="setting-group" id="timeSettings">
+            <button class="active" data-time="15">15s</button>
+            <button data-time="30">30s</button>
+            <button data-time="60">60s</button>
+            <button data-time="120">120s</button>
+        </div>
+
+        <div class="setting-group" id="languageSettings">
+            <button class="active" data-lang="uz">UZ</button>
+            <button data-lang="en">EN</button>
+        </div>
+
+    </section>
+
+    <section class="test-box" id="testBox">
+
+        <div class="stats">
+
+            <div class="stat">
+                <label>Time</label>
+                <strong id="time">15</strong>
+            </div>
+
+            <div class="stat">
+                <label>WPM</label>
+                <strong id="wpm">0</strong>
+            </div>
+
+            <div class="stat">
+                <label>Accuracy</label>
+                <strong id="accuracy">100%</strong>
+            </div>
+
+        </div>
+
+        <div id="textDisplay"></div>
+
+        <textarea
+            class="typing-input"
+            id="typingInput"
+            autocomplete="off"
+            autocorrect="off"
+            spellcheck="false"
+            aria-label="Typing test input"
+        ></textarea>
+
+        <div class="test-bottom">
+
+            <p id="instruction">
+                Testni boshlash uchun yozishni boshlang.
+            </p>
+
+            <button class="restart" onclick="restartTest()">
+                ↻ Restart Test
+            </button>
+
+        </div>
+
+    </section>
+
+    <section class="result" id="result">
+
+        <h2>Test completed!</h2>
+        <p>Mana sening natijalaring.</p>
+
+        <div class="result-stats">
+
+            <div>
+                <strong id="finalWpm">0</strong>
+                <span>WPM</span>
+            </div>
+
+            <div>
+                <strong id="finalAccuracy">0%</strong>
+                <span>Accuracy</span>
+            </div>
+
+            <div>
+                <strong id="finalChars">0</strong>
+                <span>Characters</span>
+            </div>
+
+        </div>
+
+        <button onclick="restartTest()">Try Again ↻</button>
+
+    </section>
+
+</main>
+
+<footer>
+    Made with <span>♥</span> by PULSE.TYPE
+    <br><br>
+    © 2026 PULSE.TYPE. All rights reserved.
+</footer>
+
+</div>
+
+<script>
+
+// MATNLAR
+
+const texts = {
+
+    uz: [
+        "Bugun yangi bilimlarni o'rganish uchun ajoyib kun. Har kuni ozgina mashq qilish orqali katta natijalarga erishish mumkin. Muhimi, hech qachon to'xtamaslik va doimo oldinga intilishdir.",
+
+        "Dasturlash zamonaviy dunyoning eng muhim ko'nikmalaridan biridir. HTML, CSS va JavaScript yordamida ajoyib veb saytlar yaratish mumkin. Har bir yangi loyiha tajribani oshiradi.",
+
+        "Muvaffaqiyat tasodifan kelmaydi. U doimiy mehnat, sabr va o'z ustida ishlash natijasidir. Kichik qadamlar katta maqsadlarga olib boradi.",
+
+        "PULSE.TYPE yordamida klaviaturada tez va aniq yozishni o'rgan. Har bir mashq seni yanada kuchliroq dasturchi bo'lishga yaqinlashtiradi."
+    ],
+
+    en: [
+        "The quick brown fox jumps over the lazy dog. Practice makes perfect. Every day is a new opportunity to learn something useful and improve your skills.",
+
+        "Programming is one of the most important skills in the modern world. With HTML, CSS and JavaScript you can build amazing websites and create something unique.",
+
+        "Success does not happen overnight. It takes patience, hard work and consistency. Small steps every day can lead to incredible results.",
+
+        "Welcome to PULSE.TYPE. Improve your typing speed, increase your accuracy and challenge yourself to become a faster and more confident typist."
+    ]
+
+};
+
+// VARIABLES
+
+let selectedTime = 15;
+let selectedLanguage = "uz";
+
+let timeLeft = selectedTime;
+let timer = null;
+
+let started = false;
+let finished = false;
+
+let currentText = "";
+let typedText = "";
+
+let correctChars = 0;
+let incorrectChars = 0;
+
+// ELEMENTS
+
+const input = document.getElementById("typingInput");
+const display = document.getElementById("textDisplay");
+
+const timeElement = document.getElementById("time");
+const wpmElement = document.getElementById("wpm");
+const accuracyElement = document.getElementById("accuracy");
+
+const result = document.getElementById("result");
+const instruction = document.getElementById("instruction");
+
+// RANDOM TEXT
+
+function getRandomText() {
+
+    const list = texts[selectedLanguage];
+
+    return list[Math.floor(Math.random() * list.length)];
+
+}
+
+// DISPLAY TEXT
+
+function renderText() {
+
+    display.innerHTML = "";
+
+    currentText.split("").forEach((char, index) => {
+
+        const span = document.createElement("span");
+
+        span.textContent = char;
+        span.classList.add("char");
+
+        if (index < typedText.length) {
+
+            if (typedText[index] === char) {
+                span.classList.add("correct");
+            } else {
+                span.classList.add("incorrect");
+            }
+
+        } else if (index === typedText.length && !finished) {
+
+            span.classList.add("current");
+
+        }
+
+        display.appendChild(span);
+
+    });
+
+}
+
+// START TEST
+
+function startTest() {
+
+    if (started || finished) return;
+
+    started = true;
+
+    instruction.textContent = "Yozishni davom ettir...";
+
+    timer = setInterval(() => {
+
+        timeLeft--;
+
+        timeElement.textContent = timeLeft;
+
+        updateStats();
+
+        if (timeLeft <= 0) {
+            finishTest();
+        }
+
+    }, 1000);
+
+}
+
+// UPDATE STATS
+
+function updateStats() {
+
+    const elapsed = selectedTime - timeLeft;
+
+    const minutes = Math.max(elapsed / 60, 1 / 60);
+
+    const correct = typedText.split("").filter((char, index) => {
+        return char === currentText[index];
+    }).length;
+
+    const wpm = Math.round((correct / 5) / minutes);
+
+    const accuracy = typedText.length > 0
+        ? Math.round((correct / typedText.length) * 100)
+        : 100;
+
+    wpmElement.textContent = wpm;
+
+    accuracyElement.textContent = accuracy + "%";
+
+}
+
+// FINISH TEST
+
+function finishTest() {
+
+    clearInterval(timer);
+
+    finished = true;
+
+    input.disabled = true;
+
+    instruction.textContent = "Test yakunlandi!";
+
+    renderText();
+
+    const correct = typedText.split("").filter((char, index) => {
+        return char === currentText[index];
+    }).length;
+
+    const elapsed = selectedTime - timeLeft;
+
+    const minutes = Math.max(elapsed / 60, 1 / 60);
+
+    const finalWpm = Math.round((correct / 5) / minutes);
+
+    const finalAccuracy = typedText.length > 0
+        ? Math.round((correct / typedText.length) * 100)
+        : 0;
+
+    document.getElementById("finalWpm").textContent = finalWpm;
+
+    document.getElementById("finalAccuracy").textContent =
+        finalAccuracy + "%";
+
+    document.getElementById("finalChars").textContent =
+        typedText.length;
+
+    result.style.display = "block";
+
+    result.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
+
+}
+
+// RESTART
+
+function restartTest() {
+
+    clearInterval(timer);
+
+    started = false;
+    finished = false;
+
+    timeLeft = selectedTime;
+
+    typedText = "";
+
+    currentText = getRandomText();
+
+    input.value = "";
+
+    input.disabled = false;
+
+    timeElement.textContent = timeLeft;
+
+    wpmElement.textContent = 0;
+
+    accuracyElement.textContent = "100%";
+
+    instruction.textContent =
+        "Testni boshlash uchun yozishni boshlang.";
+
+    result.style.display = "none";
+
+    renderText();
+
+    input.focus();
+
+}
+
+// INPUT EVENT
+
+input.addEventListener("input", () => {
+
+    if (finished) return;
+
+    if (!started && input.value.length > 0) {
+        startTest();
+    }
+
+    typedText = input.value;
+
+    if (typedText.length >= currentText.length) {
+        finishTest();
+        return;
+    }
+
+    renderText();
+
+    updateStats();
+
+});
+
+// TIME SETTINGS
+
+document.querySelectorAll("#timeSettings button").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        document.querySelectorAll("#timeSettings button")
+            .forEach(btn => btn.classList.remove("active"));
+
+        button.classList.add("active");
+
+        selectedTime = Number(button.dataset.time);
+
+        restartTest();
+
+    });
+
+});
+
+// LANGUAGE SETTINGS
+
+document.querySelectorAll("#languageSettings button").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        document.querySelectorAll("#languageSettings button")
+            .forEach(btn => btn.classList.remove("active"));
+
+        button.classList.add("active");
+
+        selectedLanguage = button.dataset.lang;
+
+        restartTest();
+
+    });
+
+});
+
+// THEME
+
+function toggleTheme() {
+
+    const isLight = document.body.classList.toggle("light");
+
+    const root = document.documentElement;
+
+    if (isLight) {
+
+        root.style.setProperty("--bg", "#f5f5f5");
+        root.style.setProperty("--panel", "#ffffff");
+        root.style.setProperty("--text", "#222222");
+        root.style.setProperty("--muted", "#888888");
+
+        document.getElementById("themeBtn").textContent = "☾ Dark";
+
+    } else {
+
+        root.style.setProperty("--bg", "#101010");
+        root.style.setProperty("--panel", "#181818");
+        root.style.setProperty("--text", "#e5e5e5");
+        root.style.setProperty("--muted", "#666666");
+
+        document.getElementById("themeBtn").textContent = "☀ Theme";
+
+    }
+
+}
+
+// KEYBOARD FOCUS
+
+document.addEventListener("keydown", (event) => {
+
+    if (event.ctrlKey || event.altKey || event.metaKey) return;
+
+    if (event.key.length === 1 || event.key === "Backspace") {
+
+        if (!finished) {
+            input.focus();
+        }
+
+    }
+
+});
+
+// INITIALIZE
+
+restartTest();
+
+</script>
+
+</body>
+</html>
